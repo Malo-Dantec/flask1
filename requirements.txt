@@ -1,8 +1,8 @@
-Flask>=3.0.3
-python-dotenv>=1.0.1
-SQLAlchemy>=2.0.34
-Flask-SQLAlchemy==3.1.1
-PyYAML==6.0.2
+Flask
+python-dotenv
+SQLAlchemy
+Flask-SQLAlchemy
+PyYAML
 Flask-Bootstrap5
 flask-wtf
 flask-login

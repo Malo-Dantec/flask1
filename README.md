@@ -4,6 +4,7 @@ Charger la bd :
 ```
 flask loaddb monApp/data/data.yml
 ```
+Ajouter la table User :
 ```
 flask syncdb
 ```
