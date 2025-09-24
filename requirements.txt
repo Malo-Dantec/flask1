@@ -4,3 +4,4 @@ SQLAlchemy>=2.0.34
 Flask-SQLAlchemy==3.1.1
 PyYAML==6.0.2
 Flask-Bootstrap5
+flask-wtf

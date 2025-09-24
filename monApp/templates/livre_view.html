@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block main %}
+<h1>Consultation du livre {{ selectedLivre.Titre }}</h1>
+<form role="form" method="POST" action="">
+    {{ viewForm.hidden_tag() }}
+    <div class="form-group mb-3">
+        {{ viewForm.prix.label }}
+        {{ viewForm.prix(disabled=True, class_="form-control") }}
+    </div>
+    <a href="{{ url_for('getLivres') }}" class="btn btn-secondary">Retour</a>
+</form>
+{% endblock %}

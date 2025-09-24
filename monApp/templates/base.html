@@ -4,6 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>
       {% block title %}
+
       {% endblock %}
     </title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
@@ -25,6 +26,9 @@
                 <ul class="dropdown-menu" aria-labelledby="auteursDropdown">
                   <li>
                     <a class="dropdown-item" href="{{ url_for('getAuteurs') }}">Liste des auteurs</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="{{ url_for('createAuteur') }}">Créer un auteur</a>
                   </li>
                 </ul>
               </li>
@@ -50,6 +54,7 @@
     {% block content %}
       <main id="main" role=" main" class="container">
         {% block main %}
+
         {% endblock %}
       </main>
     {% endblock %}

@@ -27,4 +27,4 @@ class Livre(db.Model):
         self.img = img
 
     def __repr__ (self ):
-        return "<Livre (%d) %s>" % (self.idL , self.Titre)
+        return "<Livre (%d) %s>" % (self.idL , self.titre)

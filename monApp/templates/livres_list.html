@@ -25,6 +25,14 @@
           <td><a href="{{ unLivre.url }}">{{ unLivre.url }}</a></td>
           <td><img src="{{ url_for('static', filename='images/' + unLivre.img) }}" alt="Première de couverture"></td>
           <td>{{ unLivre.auteur.Nom }}</td>
+          <td>
+              <a href="{{ url_for('viewLivre', idL=unLivre.idL) }}" class="btn btn-info">
+                  Voir <i class="fas fa-eye"></i>
+              </a>
+              <a href="{{ url_for('updateLivre', idL=unLivre.idL) }}" class="btn btn-warning">
+                  Modifier prix <i class="fas fa-pen"></i>
+              </a>
+          </td>
         </tr>
       {% endfor %}
     </tbody>

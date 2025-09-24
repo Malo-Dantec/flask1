@@ -11,6 +11,7 @@
         <th>ID</th>
         <th>Nom</th>
         <th>Nombre de livres</th>
+        <th>Actions possibles</th>
       </tr>
     </thead>
     <tbody>
@@ -19,6 +20,13 @@
           <td>{{ unAuteur.idA }}</td>
           <td>{{ unAuteur.Nom }}</td>
           <td>{{ unAuteur.livres.count() }}</td>
+          <td>
+            <div class="task-controls">
+              <a href="{{ url_for('viewAuteur', idA=unAuteur.idA) }}" class="btn btn-nfo">Voir <i class="fas fa-eye"></i></a>
+              <a href="{{ url_for('updateAuteur', idA=unAuteur.idA) }}" class="btn btn-warning">Editer <i class="fas fa-pen"></i></a>
+              <a href="{{ url_for('deleteAuteur', idA=unAuteur.idA) }}" class="btn btn-danger">Supprimer <i class="fas fa-trash"></i></a>
+            </div>
+          </td>
         </tr>
       {% endfor %}
     </tbody>
