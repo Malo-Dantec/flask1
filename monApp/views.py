@@ -1,3 +1,4 @@
+from flask_login import login_user
 from .app import app
 from flask import flash, render_template, request
 from monApp.models import Auteur, Livre
@@ -29,15 +30,18 @@ def getLivres():
     lesLivres = Livre.query.all()
     return render_template('livres_list.html', title="Les Livres", livres=lesLivres)
 
-from monApp.forms import FormAuteur
+from monApp.forms import FormAuteur, LoginForm
+from flask_login import login_required
 @app.route('/auteurs/<idA>/update/')
+@login_required
 def updateAuteur(idA):
     unAuteur = Auteur.query.get(idA)
-    unForm = FormAuteur(idA=unAuteur.idA , Nom=unAuteur.Nom)
+    unForm = FormAuteur (idA=unAuteur.idA , Nom=unAuteur.Nom)
     return render_template("auteur_update.html",selectedAuteur=unAuteur, updateForm=unForm)
 
 from flask import url_for , redirect
 from .app import db
+@login_required
 @app.route ('/auteur/save/', methods =("POST" ,))
 def saveAuteur():
     updatedAuteur = None
@@ -64,6 +68,7 @@ def createAuteur():
     return render_template("auteur_create.html", createForm=unForm)
 
 @app.route ('/auteur/insert/', methods =("POST" ,))
+@login_required
 def insertAuteur():
     insertedAuteur = None
     unForm = FormAuteur()
@@ -76,12 +81,14 @@ def insertAuteur():
     return render_template("auteur_create.html", createForm=unForm)
 
 @app.route('/auteurs/<idA>/delete/')
+@login_required
 def deleteAuteur(idA):
     unAuteur = Auteur.query.get(idA)
     unForm = FormAuteur(idA=unAuteur.idA, Nom=unAuteur.Nom)
     return render_template("auteur_delete.html",selectedAuteur=unAuteur, deleteForm=unForm)
 
 @app.route ('/auteur/erase/', methods =("POST" ,))
+@login_required
 def eraseAuteur():
     deletedAuteur = None
     unForm = FormAuteur()
@@ -102,6 +109,7 @@ def viewLivre(idL):
     return render_template("livre_view.html", selectedLivre=unLivre, viewForm=unForm)
 
 @app.route('/livres/<int:idL>/update/')
+@login_required
 def updateLivre(idL):
     unLivre = Livre.query.get_or_404(idL)
     # CORRECTION: Pré-remplir le formulaire avec les données existantes
@@ -109,63 +117,38 @@ def updateLivre(idL):
     return render_template("livre_update.html", selectedLivre=unLivre, updateForm=unForm)
 
 @app.route('/livre/save/', methods=["POST"])
+@login_required
 def saveLivre():
-    print("DEBUG: Route saveLivre appelée")
-    unForm = FormLivre()
-    
-    # Debug des données reçues
-    print(f"DEBUG: request.form = {request.form}")
-    print(f"DEBUG: unForm.idL.data = {unForm.idL.data}")
-    print(f"DEBUG: unForm.prix.data = {unForm.prix.data}")
-    
-    # Vérifier si le formulaire est valide
-    is_valid = unForm.validate_on_submit()
-    print(f"DEBUG: Formulaire valide? {is_valid}")
-    
-    if not is_valid:
-        print(f"DEBUG: Erreurs de validation: {unForm.errors}")
-        # Si pas valide, on doit récupérer le livre quand même pour réafficher le formulaire
-        if unForm.idL.data:
-            try:
-                idL = int(unForm.idL.data)
-                updatedLivre = Livre.query.get_or_404(idL)
-                return render_template("livre_update.html", selectedLivre=updatedLivre, updateForm=unForm)
-            except:
-                return redirect(url_for('getLivres'))
-        else:
-            return redirect(url_for('getLivres'))
-    
-    # Si le formulaire est valide
-    try:
-        idL = int(unForm.idL.data)
-        print(f"DEBUG: ID du livre à modifier: {idL}")
-        
-        updatedLivre = Livre.query.get_or_404(idL)
-        print(f"DEBUG: Livre trouvé: {updatedLivre}")
-        print(f"DEBUG: Ancien prix: {updatedLivre.prix}")
-        
-        # Modifier le prix
-        nouveau_prix = float(unForm.prix.data)
-        updatedLivre.prix = nouveau_prix
-        print(f"DEBUG: Nouveau prix: {nouveau_prix}")
-        
-        # Sauvegarder
-        db.session.commit()
-        print("DEBUG: Sauvegarde réussie dans la base")
-        
-        # Redirection vers la vue du livre
-        print(f"DEBUG: Redirection vers viewLivre avec idL={updatedLivre.idL}")
-        return redirect(url_for('viewLivre', idL=updatedLivre.idL))
-        
-    except ValueError as e:
-        print(f"DEBUG: Erreur de conversion: {e}")
-        db.session.rollback()
+    form = FormLivre()
+    if not form.validate_on_submit():
+        if form.idL.data:
+            livre = Livre.query.get_or_404(int(form.idL.data))
+            return render_template("livre_update.html", selectedLivre=livre, updateForm=form)
         return redirect(url_for('getLivres'))
-    except Exception as e:
-        print(f"DEBUG: Erreur générale: {e}")
-        db.session.rollback()
-        return redirect(url_for('getLivres'))
+    livre = Livre.query.get_or_404(int(form.idL.data))
+    livre.prix = float(form.prix.data)
+    db.session.commit()
+    return redirect(url_for('viewLivre', idL=livre.idL))
 
+@app.route ("/login/", methods =("GET","POST" ,))
+def login():
+    unForm = LoginForm ()
+    unUser=None
+    if not unForm.is_submitted():
+        unForm.next.data = request.args.get('next')
+    elif unForm.validate_on_submit():
+        unUser = unForm.get_authenticated_user()
+        if unUser:
+            login_user(unUser)
+            next = unForm.next.data or url_for("index",name=unUser.Login)
+            return redirect (next)
+    return render_template ("login.html",form=unForm)
+
+from flask_login import logout_user
+@app.route ("/logout/")
+def logout():
+    logout_user()
+    return redirect ( url_for ('index'))
 
 
 if __name__ == "__main__":

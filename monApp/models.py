@@ -28,3 +28,16 @@ class Livre(db.Model):
 
     def __repr__ (self ):
         return "<Livre (%d) %s>" % (self.idL , self.titre)
+    
+from flask_login import UserMixin
+class User(db.Model, UserMixin):
+    Login = db.Column (db.String(50), primary_key=True)
+    Password = db.Column (db.String(64))
+
+    def get_id(self):
+        return self.Login
+    
+    from .app import login_manager
+    @login_manager.user_loader
+    def load_user(username):
+        return User.query.get(username)
