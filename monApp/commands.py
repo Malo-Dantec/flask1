@@ -1,21 +1,17 @@
 import click, logging as lg
 from .app import app, db
+from . models import User, Auteur, Livre
+from hashlib import sha256
 
 @app.cli.command()
 @click.argument('filename')
-
 def loaddb(filename):
-    '''Creates the tables and populates them with data.'''
-    # création de toutes les tables
+    """Charge les données initiales dans la base de données"""
     db.drop_all()
     db.create_all()
-    # chargement de notre jeu de données
     import yaml
     with open(filename, 'r') as file:
         lesLivres = yaml.safe_load(file)
-    # import des modèles
-    from . models import Auteur,Livre
-    # première passe : création de tous les auteurs
     lesAuteurs = {}
     for livre in lesLivres :
         auteur = livre["author"]
@@ -24,7 +20,6 @@ def loaddb(filename):
             db.session.add(objet)
             lesAuteurs[auteur] = objet
     db.session.commit ()
-    # deuxième passe : création de tous les livres
     for livre in lesLivres :
         auteur = lesAuteurs[livre["author"]]
         objet = Livre(prix=livre["price"],
@@ -39,7 +34,7 @@ def loaddb(filename):
 
 @app.cli.command()
 def syncdb():
-    '''Creates all missing tables . '''
+    """Synchronise la base de données avec les modèles"""
     db.create_all()
     lg.warning('Database synchronized!')
 
@@ -47,9 +42,7 @@ def syncdb():
 @click.argument('login')
 @click.argument('pwd')
 def newuser (login, pwd):
-    '''Adds a new user'''
-    from . models import User
-    from hashlib import sha256
+    """Crée un nouvel utilisateur"""
     m = sha256()
     m.update(pwd.encode())
     unUser = User(Login=login ,Password =m.hexdigest())
@@ -61,9 +54,7 @@ def newuser (login, pwd):
 @click.argument('login')
 @click.argument('pwd')
 def newpasswrd (login, pwd):
-    '''Changes the password of an existing user'''
-    from . models import User
-    from hashlib import sha256
+    """Change le mot de passe d'un utilisateur existant"""
     unUser = User.query.get(login)
     if unUser is None :
         lg.error('User ' + login + ' does not exist!')

@@ -1,5 +1,8 @@
-from .app import db
+from .app import db, login_manager
+from flask_login import UserMixin
+
 class Auteur(db.Model):
+    """Modèle pour les auteurs"""
     idA = db.Column( db.Integer, primary_key=True )
     Nom = db.Column( db.String(100) )
     
@@ -10,6 +13,7 @@ class Auteur(db.Model):
         return "<Auteur (%d) %s>" % (self.idA , self.Nom)
 
 class Livre(db.Model):
+    """Modèle pour les livres"""
     idL = db.Column( db.Integer, primary_key=True )
     prix = db.Column( db.Float )
     titre = db.Column( db.String(255) )
@@ -28,16 +32,17 @@ class Livre(db.Model):
 
     def __repr__ (self ):
         return "<Livre (%d) %s>" % (self.idL , self.titre)
-    
-from flask_login import UserMixin
+
 class User(db.Model, UserMixin):
+    """Modèle pour les utilisateurs"""
     Login = db.Column (db.String(50), primary_key=True)
     Password = db.Column (db.String(64))
 
     def get_id(self):
+        """Récupère l'identifiant de l'utilisateur"""
         return self.Login
-    
-    from .app import login_manager
+
     @login_manager.user_loader
     def load_user(username):
+        """Charge un utilisateur par son identifiant"""
         return User.query.get(username)

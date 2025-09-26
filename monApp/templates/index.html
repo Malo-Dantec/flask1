@@ -1,6 +1,16 @@
 {% extends 'base.html' %}
+
 {% block main %}
-  <body>
-    <h1>Bienvenue {{ name }} !!</h1>
-  </body>
+<div class="container text-center mt-5">
+
+  <h1 class="mb-4">📖 Bienvenue {{ name }} !!</h1>
+
+  <div class="d-flex justify-content-center gap-3 mt-4">
+    <a href="{{ url_for('getLivres') }}" class="btn btn-primary btn-lg">
+      📚 Explorer les livres
+    </a>
+    <a href="{{ url_for('getAuteurs') }}" class="btn btn-secondary btn-lg">
+      ✍️ Voir les auteurs
+    </a>
+  </div>
 {% endblock %}

@@ -1,31 +1,35 @@
 {% extends "base.html" %}
 
 {% block main %}
-<form class="form-horizontal" role="form" method="POST" action="{{ url_for('login') }}">
-    {{ form.hidden_tag() }}
+<div class="container mt-5" style="max-width: 500px;">
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h3 class="text-center mb-4">Connexion</h3>
 
-    <div class="form-group">
-        <label for="username" class="col-sm-2 control-label">
-            {{ form.Login.label }}
-        </label>
-        <div class="col-sm-10">
-            {{ form.Login(size=50, class_="form-control") }}
-        </div>
-    </div>
+      <form method="POST" action="{{ url_for('login') }}">
+        {{ form.hidden_tag() }}
 
-    <div class="form-group">
-        <label for="password" class="col-sm-2 control-label">
-            {{ form.Password.label }}
-        </label>
-        <div class="col-sm-10">
-            {{ form.Password(size=50, class_="form-control") }}
+        <div class="mb-3">
+          {{ form.Login.label(class_="form-label") }}
+          {{ form.Login(class_="form-control {% if form.Login.errors %}is-invalid{% endif %}", placeholder="Votre identifiant") }}
+          {% for err in form.Login.errors %}
+            <div class="invalid-feedback">{{ err }}</div>
+          {% endfor %}
         </div>
-    </div>
 
-    <div class="form-group">
-        <div class="col-sm-offset-2 col-sm-10">
-            <input class="btn btn-success" type="submit" value="Se connecter">
+        <div class="mb-3">
+          {{ form.Password.label(class_="form-label") }}
+          {{ form.Password(class_="form-control {% if form.Password.errors %}is-invalid{% endif %}", placeholder="Votre mot de passe") }}
+          {% for err in form.Password.errors %}
+            <div class="invalid-feedback">{{ err }}</div>
+          {% endfor %}
         </div>
+
+        {{ form.next() }}
+
+        <button type="submit" class="btn btn-success w-100">Se connecter</button>
+      </form>
     </div>
-</form>
+  </div>
+</div>
 {% endblock %}

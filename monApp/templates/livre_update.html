@@ -1,15 +1,30 @@
 {% extends "base.html" %}
 {% block main %}
-<h1>Modification du prix du livre {{ selectedLivre.titre }}</h1>
+<h1>Modification du livre "{{ selectedLivre.titre }}"</h1>
 
 <form role="form" method="POST" action="{{ url_for('saveLivre') }}">
     {{ updateForm.hidden_tag() }}
-    
+
+    <!-- Champ titre -->
+    <div class="{{ 'form-group has-error' if updateForm.titre.errors else 'form-group mb-3' }}">
+        {{ updateForm.titre.label(class_="form-label") }}
+        {{ updateForm.titre(class_="form-control") }}
+    </div>
+
+    {% if updateForm.titre.errors %}
+    <ul class="list-group mb-3">
+        {% for e in updateForm.titre.errors %}
+        <li class="list-group-item list-group-item-danger">{{ e }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <!-- Champ prix -->
     <div class="{{ 'form-group has-error' if updateForm.prix.errors else 'form-group mb-3' }}">
         {{ updateForm.prix.label(class_="form-label") }}
         {{ updateForm.prix(class_="form-control", step="0.01", min="0") }}
     </div>
-    
+
     {% if updateForm.prix.errors %}
     <ul class="list-group mb-3">
         {% for e in updateForm.prix.errors %}
@@ -17,7 +32,8 @@
         {% endfor %}
     </ul>
     {% endif %}
-    
+
+    <!-- Boutons -->
     <div class="d-grid gap-2 d-md-flex justify-content-md-start">
         <input class="btn btn-success" type="submit" value="Enregistrer">
         <a href="{{ url_for('getLivres') }}" class="btn btn-secondary">Retour</a>

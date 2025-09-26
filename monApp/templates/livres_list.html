@@ -1,46 +1,62 @@
 {% extends 'base.html' %}
+
 {% block main %}
-  <h1>Liste des livres</h1>
-  <p>Nombre de livres : {{ livres|length }}</p>
-  {% if livres|length == 0 %}
-    <p>Aucun livre trouvé.</p>
-  {% endif %}
-  <form method="get" action="{{ url_for('getLivres') }}">
-    <input type="text" name="q" placeholder="Rechercher un livre..." value="{{ query }}">
-    <button type="submit">Rechercher</button>
-  </form>
-  <table class="table table-striped table-bordered table-hover">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Titre</th>
-        <th>Prix</th>
-        <th>URL</th>
-        <th>Première de couverture</th>
-        <th>Auteur</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for unLivre in livres %}
-        <tr>
-          <td>{{ unLivre.idL }}</td>
-          <td>{{ unLivre.titre }}</td>
-          <td>{{ unLivre.prix }}</td>
-          <td><a href="{{ unLivre.url }}">{{ unLivre.url }}</a></td>
-          <td><img src="{{ url_for('static', filename='images/' + unLivre.img) }}" alt="Première de couverture"></td>
-          <td>{{ unLivre.auteur.Nom }}</td>
-          <td>
-              <a href="{{ url_for('viewLivre', idL=unLivre.idL) }}" class="btn btn-info">
-                  Voir <i class="fas fa-eye"></i>
-              </a>
-              {% if current_user.is_authenticated %}
-              <a href="{{ url_for('updateLivre', idL=unLivre.idL) }}" class="btn btn-warning">
-                  Modifier prix <i class="fas fa-pen"></i>
-              {% endif %}
-              </a>
-          </td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+
+  <div class="container mt-4">
+    <h1 class="text-center mb-4">Catalogue des livres</h1>
+    <p class="text-muted text-center">Nombre de livres : <strong>{{ livres|length }}</strong></p>
+
+{% if livres|length == 0 %}
+  <p class="alert alert-warning text-center">Aucun livre trouvé.</p>
+{% endif %}
+
+<!-- Barre de recherche -->
+<form id="search-form" method="get" action="{{ url_for('getLivres') }}" 
+      class="d-flex justify-content-center mb-4">
+  <input type="text" id="search-input" name="q" class="form-control w-50 me-2 rounded-pill shadow-sm" 
+         placeholder="🔍 Rechercher un livre..." value="{{ query }}">
+  <button type="submit" class="btn btn-primary rounded-pill">Rechercher</button>
+</form>
+
+<!-- Grille des livres -->
+<div id="results" class="row g-4">
+  {% for unLivre in livres %}
+    <div class="col-6 col-md-4 col-lg-3 col-xl-2">
+      <div class="card h-100 d-flex flex-column shadow-sm border-0">
+        
+        <!-- Image -->
+        <a href="{{ url_for('viewLivre', idL=unLivre.idL) }}" class="text-decoration-none text-dark">
+          <div class="d-flex justify-content-center p-3">
+            <img src="{{ url_for('static', filename='images/' + unLivre.img) }}" 
+                 alt="Couverture du livre {{ unLivre.titre }}" 
+                 class="img-fluid rounded shadow-sm" 
+                 style="max-height: 250px; object-fit: cover;">
+          </div>
+
+          <!-- Infos -->
+          <div class="card-body text-center">
+            <h6 class="card-title fw-bold text-truncate" title="{{ unLivre.titre }}">
+              {{ unLivre.titre }}
+            </h6>
+            <p class="text-muted mb-1">✍️ {{ unLivre.auteur.Nom }}</p>
+            <p class="text-danger fw-bold mb-3">💰 {{ "%.2f"|format(unLivre.prix) }} €</p>
+          </div>
+        </a>
+
+        <!-- Bouton en bas -->
+        <div class="mt-auto card-footer bg-white text-center border-0 pb-3">
+          <a href="{{ unLivre.url }}" target="_blank"
+             class="btn btn-success w-100 fw-bold">
+             🛒 Acheter
+          </a>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+  </div>
+
+  <script src="{{ url_for('static', filename='js/search_livres.js') }}"></script>
+
 {% endblock %}
