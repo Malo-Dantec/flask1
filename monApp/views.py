@@ -15,22 +15,40 @@ def contact():
 @app.route('/index/')
 def index():
     if len(request.args)==0:
-        return render_template("index.html",title="R3.01 Dev Web avec Flask",name="Cricri")
+        return render_template("index.html",title="R3.01 Dev Web avec Flask",name="")
     else :
         param_name = request.args.get('name')
         return render_template("index.html",title="R3.01 Dev Web avec Flask",name=param_name)
 
 @app.route('/auteurs/')
 def getAuteurs():
-    lesAuteurs = Auteur.query.all()
-    return render_template('auteurs_list.html', title="Les Auteurs", auteurs=lesAuteurs)
+    query = request.args.get("q", "").strip()
+    if query:
+        lesAuteurs = Auteur.query.filter(Auteur.Nom.ilike(f"%{query}%")).all()
+    else:
+        lesAuteurs = Auteur.query.all()
+    return render_template(
+        'auteurs_list.html',
+        title="Les Auteurs",
+        auteurs=lesAuteurs,
+        query=query
+    )
 
 @app.route('/livres/')
 def getLivres():
-    lesLivres = Livre.query.all()
-    return render_template('livres_list.html', title="Les Livres", livres=lesLivres)
+    query = request.args.get("q", "").strip()
+    if query:
+        lesLivres = Livre.query.filter(Livre.titre.ilike(f"%{query}%")).all()
+    else:
+        lesLivres = Livre.query.all()
+    return render_template(
+        'livres_list.html',
+        title="Les Livres",
+        livres=lesLivres,
+        query=query
+    )
 
-from monApp.forms import FormAuteur, LoginForm
+from monApp.forms import FormAuteur, LoginForm, RegisterForm
 from flask_login import login_required
 @app.route('/auteurs/<idA>/update/')
 @login_required
@@ -46,10 +64,8 @@ from .app import db
 def saveAuteur():
     updatedAuteur = None
     unForm = FormAuteur()
-    #recherche de l'auteur à modifier
     idA = int(unForm.idA.data)
     updatedAuteur = Auteur.query.get(idA)
-    #si les données saisies sont valides pour la mise à jour
     if unForm.validate_on_submit():
         updatedAuteur.Nom = unForm.Nom.data
         db.session.commit()
@@ -92,10 +108,8 @@ def deleteAuteur(idA):
 def eraseAuteur():
     deletedAuteur = None
     unForm = FormAuteur()
-    #recherche de l'auteur à supprimer
     idA = int(unForm.idA.data)
     deletedAuteur = Auteur.query.get(idA)
-    #suppression
     db.session.delete(deletedAuteur)
     db.session.commit()
     return redirect(url_for('getAuteurs'))
@@ -112,8 +126,7 @@ def viewLivre(idL):
 @login_required
 def updateLivre(idL):
     unLivre = Livre.query.get_or_404(idL)
-    # CORRECTION: Pré-remplir le formulaire avec les données existantes
-    unForm = FormLivre(obj=unLivre)  # obj permet de pré-remplir automatiquement
+    unForm = FormLivre(obj=unLivre)
     return render_template("livre_update.html", selectedLivre=unLivre, updateForm=unForm)
 
 @app.route('/livre/save/', methods=["POST"])
@@ -149,6 +162,18 @@ from flask_login import logout_user
 def logout():
     logout_user()
     return redirect ( url_for ('index'))
+
+@app.route ("/register/", methods =("GET","POST" ,))
+def register():
+    unForm = RegisterForm ()
+    newUser=None
+    if unForm.validate_on_submit():
+        newUser = unForm.get_registered_user()
+        if newUser:
+            db.session.add(newUser)
+            db.session.commit()
+            return redirect ( url_for ('login'))
+    return render_template ("register.html",form=unForm)
 
 
 if __name__ == "__main__":

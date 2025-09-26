@@ -23,6 +23,7 @@
               <li class="nav-item"><a class="nav-link" href="{{ url_for ('logout') }}">Déconnexion</a></li >
               {% else %}
               <li class="nav-item"><a class="nav-link" href="{{ url_for ('login') }}">Se connecter</a></li >
+              <li class="nav-item"><a class="nav-link" href="{{ url_for ('register') }}">S'inscrire</a></li >
               {% endif %}
             </ul>
             <ul class="navbar-nav me-auto mb-2 mb-md-0">
@@ -60,7 +61,7 @@
       </nav>
     {% endblock %}
     {% block content %}
-      <main id="main" role=" main" class="container">
+      <main id="main" role=" main" class="container mt-5">
         {% block main %}
 
         {% endblock %}

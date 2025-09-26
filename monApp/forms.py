@@ -24,3 +24,17 @@ class LoginForm(FlaskForm):
         m.update(self.Password.data.encode())
         passwd = m.hexdigest()
         return unUser if passwd == unUser.Password else None
+    
+class RegisterForm(FlaskForm):
+    Login = StringField ('Identifiant', validators =[DataRequired()])
+    Password = PasswordField ('Mot de passe', validators =[DataRequired()])
+    next = HiddenField()
+    def get_registered_user(self):
+        unUser = User.query.get(self.Login.data)
+        if unUser is not None:
+            return None
+        m = sha256()
+        m.update(self.Password.data.encode())
+        passwd = m.hexdigest()
+        newUser = User(Login=self.Login.data, Password=passwd)
+        return newUser
