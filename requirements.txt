@@ -6,3 +6,6 @@ PyYAML
 Flask-Bootstrap5
 flask-wtf
 flask-login
+pytest
+pytest-flask
+coverage
