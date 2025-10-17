@@ -1,4 +1,4 @@
-## Malo DANTEC
+## Malo DANTEC - 2A3
 
 ## Base de données
 
@@ -17,6 +17,12 @@ flask syncdb
 Installer les dépendances :
 ```bash
 pip install -r requirements.txt
+```
+
+## Lancer l'application
+
+```bash
+flask run
 ```
 
 ## Utilisateur
