@@ -1,86 +1,133 @@
 {% extends 'base.html' %}
 
 {% block main %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="mb-0">
+                <i class="bi bi-book me-2"></i>Catalogue des livres
+            </h1>
+            <span class="stats-badge bg-primary text-white">
+                {{ livres|length }} livre{{ 's' if livres|length > 1 else '' }}
+            </span>
+        </div>
+    </div>
+</div>
 
-  <div class="container mt-4">
-    <h1 class="text-center mb-4">Catalogue des livres</h1>
-    <p class="text-muted text-center">Nombre de livres : <strong>{{ livres|length }}</strong></p>
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form id="search-form" method="get" action="{{ url_for('getLivres') }}">
+                    <div class="input-group search-box">
+                        <span class="input-group-text bg-white">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" 
+                               id="search-input" 
+                               name="q" 
+                               class="form-control border-start-0" 
+                               placeholder="Rechercher un livre..." 
+                               value="{{ query }}">
+                        <input type="hidden" name="sort" value="{{ sort_by }}">
+                        <button type="submit" class="btn btn-primary">
+                            Rechercher
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="dropdown">
+            <button class="btn btn-primary dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-funnel me-1"></i>Trier par
+                {% if sort_by == 'prix_asc' %}
+                    : Prix croissant
+                {% elif sort_by == 'prix_desc' %}
+                    : Prix décroissant
+                {% else %}
+                    : Titre
+                {% endif %}
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="sortDropdown">
+                <li>
+                    <a class="dropdown-item {{ 'active' if sort_by == 'titre' else '' }}" href="{{ url_for('getLivres', q=query, sort='titre') }}">
+                        <i class="bi bi-sort-alpha-down me-2"></i>Par titre
+                    </a>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <a class="dropdown-item {{ 'active' if sort_by == 'prix_asc' else '' }}" href="{{ url_for('getLivres', q=query, sort='prix_asc') }}">
+                        <i class="bi bi-currency-euro me-2"></i>Prix croissant
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item {{ 'active' if sort_by == 'prix_desc' else '' }}" href="{{ url_for('getLivres', q=query, sort='prix_desc') }}">
+                        <i class="bi bi-currency-euro me-2"></i>Prix décroissant
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
 
 {% if livres|length == 0 %}
-  <p class="alert alert-warning text-center">Aucun livre trouvé.</p>
+<div class="alert alert-info text-center">
+    <i class="bi bi-info-circle me-2"></i>
+    Aucun livre trouvé pour votre recherche.
+</div>
+{% else %}
+<div id="results" class="row g-4">
+    {% for unLivre in livres %}
+    <div class="col-6 col-md-4 col-lg-3 col-xl-2">
+        <div class="card book-card position-relative">
+            {% if current_user.is_authenticated %}
+            <button class="favori-btn position-absolute top-0 end-0 m-2" 
+                    data-livre-id="{{ unLivre.idL }}"
+                    style="z-index: 10;">
+                {% if current_user.est_favori(unLivre) %}
+                <i class="bi bi-star-fill"></i>
+                {% else %}
+                <i class="bi bi-star"></i>
+                {% endif %}
+            </button>
+            {% endif %}
+            
+            <a href="{{ url_for('viewLivre', idL=unLivre.idL) }}" class="text-decoration-none text-dark">
+                <div class="text-center p-3">
+                    <img src="{{ url_for('static', filename='images/' + unLivre.img) }}" 
+                         alt="{{ unLivre.titre }}" 
+                         class="img-fluid">
+                </div>
+                
+                <div class="card-body">
+                    <h6 class="card-title text-truncate" title="{{ unLivre.titre }}">
+                        {{ unLivre.titre }}
+                    </h6>
+                    <p class="card-text text-muted small mb-1">
+                        <i class="bi bi-person me-1"></i>{{ unLivre.auteur.Nom }}
+                    </p>
+                    <p class="card-text fw-bold text-success">
+                        {{ "%.2f"|format(unLivre.prix) }} €
+                    </p>
+                </div>
+            </a>
+            
+            <div class="card-footer bg-white border-top-0 text-center">
+                <a href="{{ unLivre.url }}" target="_blank" class="btn btn-success btn-sm w-100">
+                    <i class="bi bi-cart-plus me-1"></i>Acheter
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
 {% endif %}
 
-<form id="search-form" method="get" action="{{ url_for('getLivres') }}" 
-      class="d-flex justify-content-center mb-4">
-  <input type="text" id="search-input" name="q" class="form-control w-50 me-2 rounded-pill shadow-sm" 
-         placeholder="🔍 Rechercher un livre..." value="{{ query }}">
-  <input type="hidden" name="sort" value="{{ sort_by }}">
-  <button type="submit" class="btn btn-primary rounded-pill">Rechercher</button>
-</form>
-
-<div class="d-flex justify-content-center mb-3 gap-2">
-  <a href="{{ url_for('getLivres', q=query, sort='titre') }}" 
-     class="btn btn-sm {% if sort_by == 'titre' %}btn-primary{% else %}btn-outline-primary{% endif %}">
-    Trier par titre
-  </a>
-  <a href="{{ url_for('getLivres', q=query, sort='prix_asc') }}" 
-     class="btn btn-sm {% if sort_by == 'prix_asc' %}btn-primary{% else %}btn-outline-primary{% endif %}">
-    Prix ↑
-  </a>
-  <a href="{{ url_for('getLivres', q=query, sort='prix_desc') }}" 
-     class="btn btn-sm {% if sort_by == 'prix_desc' %}btn-primary{% else %}btn-outline-primary{% endif %}">
-    Prix ↓
-  </a>
-</div>
-
-<div id="results" class="row g-4">
-  {% for unLivre in livres %}
-    <div class="col-6 col-md-4 col-lg-3 col-xl-2">
-      <div class="card h-100 d-flex flex-column shadow-sm border-0 position-relative">
-        
-        {% if current_user.is_authenticated %}
-        <button class="btn btn-link position-absolute top-0 end-0 p-2 favori-btn" 
-                data-livre-id="{{ unLivre.idL }}"
-                style="z-index: 10; font-size: 1.5rem; text-decoration: none;">
-          {% if current_user.est_favori(unLivre) %}
-            ⭐
-          {% else %}
-            ☆
-          {% endif %}
-        </button>
-        {% endif %}
-        
-        <a href="{{ url_for('viewLivre', idL=unLivre.idL) }}" class="text-decoration-none text-dark">
-          <div class="d-flex justify-content-center p-3">
-            <img src="{{ url_for('static', filename='images/' + unLivre.img) }}" 
-                 alt="Couverture du livre {{ unLivre.titre }}" 
-                 class="img-fluid rounded shadow-sm" 
-                 style="max-height: 250px; object-fit: cover;">
-          </div>
-
-          <div class="card-body text-center">
-            <h6 class="card-title fw-bold text-truncate" title="{{ unLivre.titre }}">
-              {{ unLivre.titre }}
-            </h6>
-            <p class="text-muted mb-1">✍️ {{ unLivre.auteur.Nom }}</p>
-            <p class="text-danger fw-bold mb-3">💰 {{ "%.2f"|format(unLivre.prix) }} €</p>
-          </div>
-        </a>
-
-        <div class="mt-auto card-footer bg-white text-center border-0 pb-3">
-          <a href="{{ unLivre.url }}" target="_blank"
-             class="btn btn-success w-100 fw-bold">
-             🛒 Acheter
-          </a>
-        </div>
-      </div>
-    </div>
-  {% endfor %}
-</div>
-
-  </div>
-
-  <script src="{{ url_for('static', filename='js/search_livres.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/favoris.js') }}"></script>
-
+<script src="{{ url_for('static', filename='js/search_livres.js') }}"></script>
+<script src="{{ url_for('static', filename='js/favoris.js') }}"></script>
 {% endblock %}

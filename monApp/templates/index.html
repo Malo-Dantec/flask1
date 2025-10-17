@@ -1,8 +1,62 @@
 {% extends 'base.html' %}
 
 {% block main %}
-<div class="container text-center mt-5">
+<div class="page-header text-center">
+    <div class="container">
+        <h1 class="display-4 fw-bold mb-3">
+            Bienvenue{% if name %} {{ name }}{% endif %}
+        </h1>
+        <p class="lead">Explorez notre collection de livres et d'auteurs</p>
+    </div>
+</div>
 
-  <h1 class="mb-4">Bienvenue {{ name }} !!</h1>
+<div class="row g-4 mt-4">
+    <div class="col-md-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <i class="bi bi-person display-1 text-primary mb-3"></i>
+                <h5 class="card-title">Auteurs</h5>
+                <p class="card-text">Découvrez nos auteurs et leurs œuvres</p>
+                <a href="{{ url_for('getAuteurs') }}" class="btn btn-primary">
+                    Voir les auteurs
+                </a>
+            </div>
+        </div>
+    </div>
 
+    <div class="col-md-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <i class="bi bi-book display-1 text-success mb-3"></i>
+                <h5 class="card-title">Livres</h5>
+                <p class="card-text">Parcourez notre catalogue de livres</p>
+                <a href="{{ url_for('getLivres') }}" class="btn btn-success">
+                    Voir les livres
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                {% if current_user.is_authenticated %}
+                <i class="bi bi-star-fill display-1 text-warning mb-3"></i>
+                <h5 class="card-title">Mes Favoris</h5>
+                <p class="card-text">Accédez à vos livres favoris</p>
+                <a href="{{ url_for('mesFavoris') }}" class="btn btn-warning">
+                    Voir mes favoris
+                </a>
+                {% else %}
+                <i class="bi bi-person-circle display-1 text-secondary mb-3"></i>
+                <h5 class="card-title">Connexion</h5>
+                <p class="card-text">Connectez-vous pour gérer vos favoris</p>
+                <a href="{{ url_for('login') }}" class="btn btn-secondary">
+                    Se connecter
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

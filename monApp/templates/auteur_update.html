@@ -1,26 +1,47 @@
 {% extends "base.html" %}
+
 {% block main %}
-<h1 >Modification de l'auteur {{ selectedAuteur.Nom }}</h1>
-<form role="form" method="POST" action="{{ url_for ('saveAuteur') }}">
-    {{ updateForm.hidden_tag () }}
-    <div
-    {% if updateForm.Nom.errors %}
-    class="form-group has-error"
-    {% else %}
-    class="form-group mb-3"
-    {% endif %}
-    >
-    {{ updateForm.Nom.label }}
-    {{ updateForm.Nom(size =50, class_="form-control") }}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h4 class="mb-0">
+                    <i class="bi bi-pencil me-2"></i>Modification de l'auteur
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <div class="alert alert-light mb-4">
+                    <strong>Auteur actuel :</strong> {{ selectedAuteur.Nom }}
+                </div>
+
+                <form role="form" method="POST" action="{{ url_for('saveAuteur') }}">
+                    {{ updateForm.hidden_tag() }}
+                    
+                    <div class="mb-3">
+                        {{ updateForm.Nom.label(class_="form-label fw-semibold") }}
+                        {{ updateForm.Nom(size=50, class_="form-control", placeholder="Entrez le nouveau nom") }}
+                        {% if updateForm.Nom.errors %}
+                        <div class="mt-2">
+                            {% for e in updateForm.Nom.errors %}
+                            <div class="alert alert-danger py-2">
+                                <i class="bi bi-exclamation-triangle me-1"></i>{{ e }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-warning">
+                            <i class="bi bi-save me-1"></i>Enregistrer
+                        </button>
+                        <a href="{{ url_for('getAuteurs') }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left me-1"></i>Retour
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-    {% if updateForm.Nom.errors %}
-    <ul class ="list-group">
-    {% for e in updateForm.Nom.errors %}
-        <li class ="list-group-item list-group-item-danger" >{{ e }} </li >
-    {% endfor %}
-    </ul >
-    {% endif %}
-    <input class ="btn btn-success" type="submit" value ="Enregistrer">
-    <a href="{{ url_for('getAuteurs') }}" class="btn btn-secondary">Retour</a>
-</form >
+</div>
 {% endblock %}

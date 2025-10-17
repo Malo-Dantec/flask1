@@ -19,7 +19,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 const data = await response.json();
                 
                 if (data.success) {
-                    btn.textContent = data.est_favori ? "⭐" : "☆";
+                    const icon = btn.querySelector('i');
+                    if (data.est_favori) {
+                        icon.className = "bi bi-star-fill";
+                    } else {
+                        icon.className = "bi bi-star";
+                    }
                 }
             } catch (error) {
                 console.error("Erreur lors de la modification du favori:", error);
