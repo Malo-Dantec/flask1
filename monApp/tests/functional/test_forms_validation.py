@@ -16,7 +16,7 @@ def test_auteur_insert_empty_name(client):
         follow_redirects=True
     )
     assert response.status_code == 200
-    assert b"Creation" in response.data or b"Cr\xc3\xa9ation" in response.data
+    assert b"Creation" in response.data or b"Creation" in response.data
 
 def test_auteur_save_empty_name(client, testapp):
     with testapp.app_context():

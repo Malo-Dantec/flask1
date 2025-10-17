@@ -30,3 +30,14 @@ def test_livre_update_after_login(client):
     response = login(client, "CDAL", "AIGRE", "/livres/1/update/")
     assert response.status_code == 200
     assert "Modification du livre".encode() in response.data
+    
+def test_livre_create_before_login(client):
+    response = client.get('/livre/create/', follow_redirects=True)
+    assert response.status_code == 200
+    assert b"Connexion" in response.data
+
+def test_livre_create_after_login(client):
+    response = login(client, "CDAL", "AIGRE", "/livre/create/")
+    assert response.status_code == 200
+    assert b"Creation d'un nouveau livre" in response.data
+    

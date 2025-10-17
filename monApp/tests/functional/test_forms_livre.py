@@ -58,6 +58,22 @@ def test_livre_save_success(client, testapp):
         livre = Livre.query.get(1)
         assert livre.titre == "Les Misérables Edition Spéciale"
         assert livre.prix == 19.99
+        
+def test_livre_insert_success(client, testapp):
+    login(client, "CDAL", "AIGRE", "/livre/insert/")
+    response = client.post(
+        "/livre/insert/",
+        data={"titre": "Nouveau Livre", "prix": "15.50"},
+        follow_redirects=True
+    )
+    
+    assert response.status_code == 200
+    assert b"Nouveau Livre" in response.data
+    
+    with testapp.app_context():
+        livre = Livre.query.filter_by(titre="Nouveau Livre").first()
+        assert livre is not None
+        assert livre.prix == 15.50
 
 def test_livre_save_validation_error(client, testapp):
     login(client, "CDAL", "AIGRE", "/livre/save/")
