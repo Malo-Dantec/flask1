@@ -41,22 +41,33 @@
                             </a></li>
                         </ul>
                     </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="livresDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person me-1"></i>Livres
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('getLivres') }}">
+                                <i class="bi bi-list-ul me-2"></i>Liste des livres
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('createLivre') }}">
+                                <i class="bi bi-plus-circle me-2"></i>Créer un Livre
+                            </a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('mesFavoris') }}">
+                            <i class="bi bi-star me-1"></i>Mes favoris
+                        </a>
+                    </li>
                     {% else %}
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('getAuteurs') }}">
                             <i class="bi bi-person me-1"></i>Auteurs
                         </a>
                     </li>
-                    {% endif %}
-                    <li class="nav-item">
+                                        <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('getLivres') }}">
                             <i class="bi bi-book me-1"></i>Livres
-                        </a>
-                    </li>
-                    {% if current_user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('mesFavoris') }}">
-                            <i class="bi bi-star me-1"></i>Mes favoris
                         </a>
                     </li>
                     {% endif %}

@@ -1,8 +1,9 @@
 from flask_wtf import FlaskForm
-from wtforms import DecimalField, StringField, HiddenField, FloatField, PasswordField, SubmitField
+from wtforms import DecimalField, FileField, StringField, HiddenField, FloatField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, NumberRange
 from hashlib import sha256
 from .models import User
+from flask_wtf.file import FileField, FileAllowed, FileRequired
 
 class FormAuteur(FlaskForm):
     """Formulaire pour les auteurs"""
@@ -14,7 +15,9 @@ class FormLivre(FlaskForm):
     idL = HiddenField("idL")
     titre = StringField("Titre", validators=[DataRequired()])
     prix = DecimalField("Prix", validators=[DataRequired(), NumberRange(min=0)])
-    submit = SubmitField("Enregistrer")
+    url = StringField("URL", validators=[DataRequired()])
+    img = FileField("Image", validators=[FileRequired()])
+    nomA = StringField("Auteur", validators=[DataRequired()])
 
 class LoginForm(FlaskForm):
     """Formulaire de login"""

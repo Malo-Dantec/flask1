@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block main %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    <i class="bi bi-person-plus me-2"></i>Création d'un Livre
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <form role="form" method="POST" action="{{ url_for('insertLivre') }}" enctype="multipart/form-data">
+                    {{ createForm.hidden_tag() }}
+                    
+                    <div class="mb-3">
+                        {{ createForm.titre.label(class_="form-label fw-semibold") }}
+                        {{ createForm.titre(size=50, class_='form-control', placeholder="Entrez le titre du livre") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ createForm.prix.label(class_="form-label fw-semibold") }}
+                        {{ createForm.prix(class_='form-control', placeholder="Entrez le prix du livre") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ createForm.url.label(class_="form-label fw-semibold") }}
+                        {{ createForm.url(size=500, class_='form-control', placeholder="Entrez l'URL du livre") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ createForm.img.label(class_="form-label fw-semibold") }}
+                        {{ createForm.img(class_='form-control') }}
+                    </div>
+                    <div class="mb-3">
+                        {{ createForm.nomA.label(class_="form-label fw-semibold") }}
+                        {{ createForm.nomA(size=50, class_='form-control', placeholder="Entrez le nom de l'auteur") }}
+                    </div>
+
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle me-1"></i>Créer
+                        </button>
+                        <a href="{{ url_for('getLivres') }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left me-1"></i>Retour
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

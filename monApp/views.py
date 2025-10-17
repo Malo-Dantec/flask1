@@ -1,3 +1,4 @@
+import os
 from flask_login import login_user, login_required, logout_user, current_user
 from flask import render_template, request, url_for, redirect, jsonify
 from .app import app, db
@@ -119,7 +120,7 @@ def getLivres():
     """Liste des livres, avec recherche et tri possibles"""
     query = request.args.get("q", "").strip()
     sort_by = request.args.get("sort", "titre")
-    
+
     if query:
         lesLivres = Livre.query.filter(Livre.titre.ilike(f"%{query}%"))
     else:
@@ -163,6 +164,39 @@ def saveLivre():
         db.session.commit()
         return redirect(url_for('viewLivre', idL=updatedLivre.idL))
     return render_template("livre_update.html", selectedLivre=updatedLivre, updateForm=unForm)
+
+@app.route('/livre/create/')
+@login_required
+def createLivre():
+    """Formulaire de création d'un livre"""
+    unForm = FormLivre()
+    return render_template("livre_create.html", createForm=unForm)
+
+@app.route('/livre/insert/', methods=("POST",))
+@login_required
+def insertLivre():
+    """Insertion d'un nouveau livre"""
+    insertedLivre = None
+    unForm = FormLivre()
+    auteur_nom = unForm.nomA.data
+    auteur = Auteur.query.filter_by(Nom=auteur_nom).first()
+    image_file = unForm.img.data
+    filename = None
+    if image_file:
+        filename = image_file.filename
+        image_path = os.path.join('monApp/static/images', filename)
+        image_file.save(image_path)
+    if unForm.validate_on_submit():
+        insertedLivre = Livre(titre=unForm.titre.data,
+                              prix=unForm.prix.data,
+                              url=unForm.url.data,
+                              img=filename,
+                              auteur=auteur)
+        db.session.add(insertedLivre)
+        db.session.commit()
+        return redirect(url_for('getLivres'))
+    return render_template("livre_create.html", createForm=unForm)
+
 
 @app.route('/favoris/')
 @login_required
