@@ -11,14 +11,14 @@ def test_user_get_id(testapp):
         assert user.get_id() == "CDAL"
 
 def test_load_user(testapp):
-    from monApp.app import login_manager
+    """Test de la fonction load_user"""
     with testapp.app_context():
-        user = login_manager.user_loader("CDAL")
+        user = User.load_user("CDAL")
         assert user is not None
         assert user.Login == "CDAL"
 
 def test_load_user_not_found(testapp):
-    from monApp.app import login_manager
+    """Test de la fonction load_user avec un utilisateur inexistant"""
     with testapp.app_context():
-        user = login_manager.user_loader("NONEXISTENT")
+        user = User.load_user("NONEXISTENT")
         assert user is None

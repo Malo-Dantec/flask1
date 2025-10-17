@@ -28,7 +28,7 @@ def test_auteur_update_before_login(client):
 def test_auteur_update_after_login(client, testapp):
     response = login(client, "CDAL", "AIGRE", "/auteurs/1/update/")
     assert response.status_code == 200
-    assert "Modification de l'auteur Victor Hugo".encode() in response.data
+    assert "Modification de l'auteur Victor Hugo".encode('utf-8') in response.data
 
 def test_auteur_delete_before_login(client):
     response = client.get('/auteurs/1/delete/', follow_redirects=True)
@@ -38,14 +38,14 @@ def test_auteur_delete_before_login(client):
 def test_auteur_delete_after_login(client):
     response = login(client, "CDAL", "AIGRE", "/auteurs/1/delete/")
     assert response.status_code == 200
-    assert "Suppression de l'auteur Victor Hugo".encode() in response.data
+    assert "Suppression de l'auteur Victor Hugo".encode('utf-8') in response.data
 
 def test_auteur_create_before_login(client):
     response = client.get('/auteur/')
     assert response.status_code == 200
-    assert "Creation d'un auteur".encode() in response.data or b"Connexion" in response.data
+    assert "Création d'un auteur".encode('utf-8') in response.data
 
 def test_auteur_create_after_login(client):
     response = login(client, "CDAL", "AIGRE", "/auteur/")
     assert response.status_code == 200
-    assert "Creation d'un auteur".encode() in response.data
+    assert "Création d'un auteur".encode('utf-8') in response.data
