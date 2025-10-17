@@ -3,6 +3,7 @@ from flask import render_template, request, url_for, redirect, jsonify
 from .app import app, db
 from monApp.models import Auteur, Livre
 from monApp.forms import FormAuteur, FormLivre, LoginForm, RegisterForm
+from sqlalchemy import func
 
 @app.route('/about/')
 def about():
@@ -26,13 +27,24 @@ def index():
 
 @app.route('/auteurs/')
 def getAuteurs():
-    """Liste des auteurs, avec recherche possible"""
+    """Liste des auteurs, avec recherche et tri possibles"""
     query = request.args.get("q", "").strip()
+    sort_by = request.args.get("sort", "nom")
+    
     if query:
-        lesAuteurs = Auteur.query.filter(Auteur.Nom.ilike(f"%{query}%")).all()
+        lesAuteurs = Auteur.query.filter(Auteur.Nom.ilike(f"%{query}%"))
     else:
-        lesAuteurs = Auteur.query.all()
-    return render_template("auteurs_list.html", title="Les Auteurs", auteurs=lesAuteurs, query=query)
+        lesAuteurs = Auteur.query
+    
+    if sort_by == "livres_asc":
+        lesAuteurs = lesAuteurs.outerjoin(Livre).group_by(Auteur.idA).order_by(func.count(Livre.idL).asc())
+    elif sort_by == "livres_desc":
+        lesAuteurs = lesAuteurs.outerjoin(Livre).group_by(Auteur.idA).order_by(func.count(Livre.idL).desc())
+    else:
+        lesAuteurs = lesAuteurs.order_by(Auteur.Nom)
+    
+    lesAuteurs = lesAuteurs.all()
+    return render_template("auteurs_list.html", title="Les Auteurs", auteurs=lesAuteurs, query=query, sort_by=sort_by)
 
 @app.route('/auteurs/<idA>/update/')
 @login_required
@@ -104,13 +116,24 @@ def eraseAuteur():
 
 @app.route('/livres/')
 def getLivres():
-    """Liste des livres, avec recherche possible"""
+    """Liste des livres, avec recherche et tri possibles"""
     query = request.args.get("q", "").strip()
+    sort_by = request.args.get("sort", "titre")
+    
     if query:
-        lesLivres = Livre.query.filter(Livre.titre.ilike(f"%{query}%")).all()
+        lesLivres = Livre.query.filter(Livre.titre.ilike(f"%{query}%"))
     else:
-        lesLivres = Livre.query.all()
-    return render_template("livres_list.html", title="Les Livres", livres=lesLivres, query=query)
+        lesLivres = Livre.query
+    
+    if sort_by == "prix_asc":
+        lesLivres = lesLivres.order_by(Livre.prix.asc())
+    elif sort_by == "prix_desc":
+        lesLivres = lesLivres.order_by(Livre.prix.desc())
+    else:
+        lesLivres = lesLivres.order_by(Livre.titre)
+    
+    lesLivres = lesLivres.all()
+    return render_template("livres_list.html", title="Les Livres", livres=lesLivres, query=query, sort_by=sort_by)
 
 @app.route('/livres/<int:idL>/view/')
 def viewLivre(idL):
