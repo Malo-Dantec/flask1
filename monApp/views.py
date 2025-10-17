@@ -1,12 +1,8 @@
-from flask_login import login_user, login_required, logout_user
-from flask import render_template, request, url_for, redirect
+from flask_login import login_user, login_required, logout_user, current_user
+from flask import render_template, request, url_for, redirect, jsonify
 from .app import app, db
 from monApp.models import Auteur, Livre
 from monApp.forms import FormAuteur, FormLivre, LoginForm, RegisterForm
-
-# ==============================
-# ROUTES DE BASE
-# ==============================
 
 @app.route('/about/')
 def about():
@@ -27,10 +23,6 @@ def index():
     else:
         param_name = request.args.get('name')
         return render_template("index.html", title="R3.01 Dev Web avec Flask", name=param_name)
-
-# ==============================
-# ROUTES POUR LES AUTEURS
-# ==============================
 
 @app.route('/auteurs/')
 def getAuteurs():
@@ -110,10 +102,6 @@ def eraseAuteur():
     db.session.commit()
     return redirect(url_for('getAuteurs'))
 
-# ==============================
-# ROUTES POUR LES LIVRES
-# ==============================
-
 @app.route('/livres/')
 def getLivres():
     """Liste des livres, avec recherche possible"""
@@ -153,9 +141,28 @@ def saveLivre():
         return redirect(url_for('viewLivre', idL=updatedLivre.idL))
     return render_template("livre_update.html", selectedLivre=updatedLivre, updateForm=unForm)
 
-# ==============================
-# LOGIN / LOGOUT / REGISTER
-# ==============================
+@app.route('/favoris/')
+@login_required
+def mesFavoris():
+    """Liste des livres favoris de l'utilisateur connecté"""
+    livres_favoris = current_user.favoris
+    return render_template("favoris.html", title="Mes Favoris", livres=livres_favoris)
+
+@app.route('/favoris/toggle/<int:idL>', methods=("POST",))
+@login_required
+def toggleFavori(idL):
+    """Ajoute ou retire un livre des favoris"""
+    livre = Livre.query.get_or_404(idL)
+    
+    if current_user.est_favori(livre):
+        current_user.favoris.remove(livre)
+        est_favori = False
+    else:
+        current_user.favoris.append(livre)
+        est_favori = True
+    
+    db.session.commit()
+    return jsonify({'success': True, 'est_favori': est_favori})
 
 @app.route("/login/", methods=("GET", "POST",))
 def login():
@@ -190,10 +197,6 @@ def register():
             db.session.commit()
             return redirect(url_for('login'))
     return render_template("register.html", form=unForm)
-
-# ==============================
-# LANCEMENT DE L'APPLICATION
-# ==============================
 
 if __name__ == "__main__":
     app.run()

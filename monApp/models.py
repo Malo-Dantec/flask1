@@ -33,10 +33,17 @@ class Livre(db.Model):
     def __repr__ (self ):
         return "<Livre (%d) %s>" % (self.idL , self.titre)
 
+favoris = db.Table('favoris',
+    db.Column('user_login', db.String(50), db.ForeignKey('user.Login'), primary_key=True),
+    db.Column('livre_id', db.Integer, db.ForeignKey('livre.idL'), primary_key=True)
+)
+
 class User(db.Model, UserMixin):
     """Modèle pour les utilisateurs"""
     Login = db.Column (db.String(50), primary_key=True)
     Password = db.Column (db.String(64))
+    
+    favoris = db.relationship('Livre', secondary=favoris, backref=db.backref('favori_par', lazy='dynamic'))
 
     def get_id(self):
         """Récupère l'identifiant de l'utilisateur"""
@@ -46,3 +53,7 @@ class User(db.Model, UserMixin):
     def load_user(username):
         """Charge un utilisateur par son identifiant"""
         return User.query.get(username)
+    
+    def est_favori(self, livre):
+        """Vérifie si un livre est dans les favoris de l'utilisateur"""
+        return livre in self.favoris

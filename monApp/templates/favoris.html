@@ -3,36 +3,23 @@
 {% block main %}
 
   <div class="container mt-4">
-    <h1 class="text-center mb-4">Catalogue des livres</h1>
-    <p class="text-muted text-center">Nombre de livres : <strong>{{ livres|length }}</strong></p>
+    <h1 class="text-center mb-4">Mes Favoris</h1>
+    <p class="text-muted text-center">Nombre de livres favoris : <strong>{{ livres|length }}</strong></p>
 
 {% if livres|length == 0 %}
-  <p class="alert alert-warning text-center">Aucun livre trouvé.</p>
-{% endif %}
+  <p class="alert alert-warning text-center">Vous n'avez pas encore de livres favoris.</p>
+{% else %}
 
-<form id="search-form" method="get" action="{{ url_for('getLivres') }}" 
-      class="d-flex justify-content-center mb-4">
-  <input type="text" id="search-input" name="q" class="form-control w-50 me-2 rounded-pill shadow-sm" 
-         placeholder="🔍 Rechercher un livre..." value="{{ query }}">
-  <button type="submit" class="btn btn-primary rounded-pill">Rechercher</button>
-</form>
-
-<div id="results" class="row g-4">
+<div class="row g-4">
   {% for unLivre in livres %}
     <div class="col-6 col-md-4 col-lg-3 col-xl-2">
       <div class="card h-100 d-flex flex-column shadow-sm border-0 position-relative">
         
-        {% if current_user.is_authenticated %}
         <button class="btn btn-link position-absolute top-0 end-0 p-2 favori-btn" 
                 data-livre-id="{{ unLivre.idL }}"
                 style="z-index: 10; font-size: 1.5rem; text-decoration: none;">
-          {% if current_user.est_favori(unLivre) %}
-            ⭐
-          {% else %}
-            ☆
-          {% endif %}
+          ⭐
         </button>
-        {% endif %}
         
         <a href="{{ url_for('viewLivre', idL=unLivre.idL) }}" class="text-decoration-none text-dark">
           <div class="d-flex justify-content-center p-3">
@@ -62,9 +49,10 @@
   {% endfor %}
 </div>
 
+{% endif %}
+
   </div>
 
-  <script src="{{ url_for('static', filename='js/search_livres.js') }}"></script>
   <script src="{{ url_for('static', filename='js/favoris.js') }}"></script>
 
 {% endblock %}
